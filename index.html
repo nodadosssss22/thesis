@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Activity Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #summary-container {
+            margin-top: 20px;
+        }
+        .summary-section {
+            margin-bottom: 20px;
+        }
+        h3 {
+            margin-bottom: 10px;
+        }
+        .summary {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>User Activity Tracker</h1>
+
+    <div id="summary-container">
+        <!-- Keyboard Activity Summary -->
+        <div id="keyboard-summary" class="summary-section">
+            <h3>Keyboard Activity</h3>
+            <p>No keyboard activity recorded.</p>
+        </div>
+
+        <!-- Mouse Activity Summary -->
+        <div id="mouse-summary" class="summary-section">
+            <h3>Mouse Activity</h3>
+            <p>No mouse activity recorded.</p>
+        </div>
+
+        <!-- Combined Activity Summary -->
+        <div id="combined-summary" class="summary-section">
+            <h3>Combined Activity</h3>
+            <p>No combined activity recorded.</p>
+        </div>
+
+        <!-- Inactivity Summary -->
+        <div id="inactivity-summary" class="summary-section">
+            <h3>Inactivity Summary</h3>
+            <p>Total Inactive Time: 0 hours, 0 minutes, 0 seconds, 0 ms</p>
+        </div>
+    </div>
+
+    <!-- Link to monitor.js -->
+    <script src="monitor.js"></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+import tkinter as tk
+from tkinter import messagebox
+import json
+import os
+
+class FlashcardViewer:
+    def __init__(self, parent, flashcards, save_file="progress.json"):
+        self.flashcards = flashcards
+        self.save_file = save_file
+        self.current_index = self.load_progress()
+        self.score = 0
+        self.frame = tk.Frame(parent, bg="white", relief=tk.RAISED, bd=2)
+        self.frame.pack(fill=tk.BOTH, expand=True)
+
+        self.question_label = tk.Label(self.frame, text="", font=("Arial", 16), wraplength=500)
+        self.question_label.pack(pady=20)
+
+        self.multiple_choice_area = None
+        self.selected_answer = tk.StringVar()
+
+        self.next_button = tk.Button(self.frame, text="Next", command=self.show_next_flashcard)
+        self.next_button.pack(pady=10)
+
+        self.show_flashcard()
+
+    def save_progress(self):
+        data = {
+            "current_index": self.current_index,
+            "score": self.score,
+        }
+        with open(self.save_file, "w") as file:
+            json.dump(data, file)
+
+    def load_progress(self):
+        if os.path.exists(self.save_file):
+            with open(self.save_file, "r") as file:
+                data = json.load(file)
+                self.score = data.get("score", 0)
+                return data.get("current_index", 0)
+        return 0
+
+    def show_flashcard(self):
+        if self.multiple_choice_area:
+            self.multiple_choice_area.destroy()
+        self.selected_answer.set("")  # Clear previous selections
+
+        if self.current_index < len(self.flashcards):
+            question_data = self.flashcards[self.current_index]
+            question = question_data["question"]
+            q_type = question_data["type"]
+
+            self.question_label.config(text=question)
+
+            if q_type == "multiple choice":
+                self.multiple_choice_area = tk.Frame(self.frame)
+                self.multiple_choice_area.pack(pady=10)
+                for choice in question_data.get("choices", []):
+                    tk.Radiobutton(
+                        self.multiple_choice_area, text=choice, variable=self.selected_answer, value=choice
+                    ).pack(anchor="w")
+
+            elif q_type == "coding":
+                self.question_label.config(text=f"Think about the following coding task:\n\n{question}")
+        else:
+            self.question_label.config(
+                text=f"Quiz complete! Your score is {self.score}/{self.get_total_questions()}."
+            )
+            self.next_button.config(state=tk.DISABLED)
+            messagebox.showinfo("Flashcards", f"You finished the quiz! Final score: {self.score}")
+
+    def show_next_flashcard(self):
+        if self.current_index < len(self.flashcards):
+            question_data = self.flashcards[self.current_index]
+            if question_data["type"] == "multiple choice":
+                correct_answer = question_data.get("correct_answer")
+                if self.selected_answer.get() == correct_answer:
+                    self.score += 1
+
+            self.current_index += 1
+            self.save_progress()
+            self.show_flashcard()
+        else:
+            self.save_progress()
+
+    def get_total_questions(self):
+        return len([q for q in self.flashcards if q["type"] == "multiple choice"])
+
+# Main Application // DISPLAYS ALL TRACKED DATA
+root = tk.Tk()
+root.title("Flashcard Viewer with Score Tracking and Resume")
+root.geometry("600x400")
+
+# Flashcards Data with Classification and Answers // ONLY SAMPLE QUESTIONS, ADD BETTER ONES IN THE FUTURE
+flashcards = [
+    {"question": "What is Python?", "type": "multiple choice", 
+     "choices": ["A language", "An animal", "A framework"], "correct_answer": "A language"},
+    {"question": "Write a function to reverse a string.", "type": "coding"},
+    {"question": "What is the difference between a list and a tuple?", "type": "multiple choice", 
+     "choices": ["Mutable vs Immutable", "Ordered vs Unordered", "None"], "correct_answer": "Mutable vs Immutable"},
+    {"question": "What is a lambda function in Python?", "type": "multiple choice", 
+     "choices": ["A function with no name", "A module in Python", "A class"], "correct_answer": "A function with no name"},
+]
+
+# Add Flashcard Viewer
+flashcard_viewer = FlashcardViewer(root, flashcards)
+
+root.mainloop()
